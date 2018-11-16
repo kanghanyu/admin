@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.khy.mapper.UserMapper">
+	
+	
+ <sql id="Base_Column_List">
+    id, uid, phone, password, create_time, money,card_money,commission,img, img_url, inviter_uid, inviter_phone,is_manager,is_vip,status
+  </sql>
+  
+	<select id="getUserByPhone" parameterType="java.lang.String" resultType="com.khy.entity.User">
+		SELECT 
+			<include refid="Base_Column_List"/>
+		FROM
+			t_user
+		WHERE
+			phone=#{phone}
+		LIMIT 1
+	</select>
+	<select id="getUserByUid" parameterType="java.lang.String" resultType="com.khy.entity.User">
+		SELECT 
+			<include refid="Base_Column_List"/>
+		FROM
+			t_user
+		WHERE
+			uid=#{uid}
+		LIMIT 1
+	</select>
+	
+	<select id="list" parameterType="com.khy.entity.User" resultType="com.khy.entity.User">
+		SELECT 
+			<include refid="Base_Column_List"/>
+		FROM
+			t_user
+		<where>
+			<if test="null != phone and phone != '' ">
+				AND phone like concat('%',#{phone},'%')
+			</if>
+			<if test="null != inviterPhone and inviterPhone != '' ">
+				AND inviter_phone like concat('%',#{inviterPhone},'%')
+			</if>
+			<if test="null != isManager">
+				AND is_manager = #{isManager}
+			</if>
+			<if test="null != isVip">
+				AND is_vip = #{isVip}
+			</if>
+			<if test="null != startDate and startDate != '' ">
+				AND DATE_FORMAT(create_time,'%Y-%m-%d') >= #{startDate}
+			</if>
+			<if test="null != endDate and endDate != '' ">
+			   <![CDATA[AND DATE_FORMAT(create_time,'%Y-%m-%d') <= #{endDate}]]>
+			</if>
+		</where>
+	</select>
+	
+	<select id="getUserCount" parameterType="com.khy.entity.User" resultType="com.khy.mapper.dto.UserCountDTO">
+	SELECT
+		IFNULL(SUM(money),0)  totalMoney,
+		IFNULL(SUM(card_money),0)  totalCardMoney,
+		IFNULL(SUM(commission),0)  totalCommission,
+		COUNT(*) amount ,
+		COUNT(CASE WHEN is_vip = 1 THEN 1 ELSE NULL END) vipNum
+	FROM
+		t_user
+		<where>
+			<if test="null != phone and phone != '' ">
+				AND phone like concat('%',#{phone},'%')
+			</if>
+			<if test="null != inviterPhone and inviterPhone != '' ">
+				AND inviter_phone like concat('%',#{inviterPhone},'%')
+			</if>
+			<if test="null != isManager">
+				AND is_manager = #{isManager}
+			</if>
+			<if test="null != isVip">
+				AND is_vip = #{isVip}
+			</if>
+			<if test="null != startDate and startDate != '' ">
+				AND DATE_FORMAT(create_time,'%Y-%m-%d') >= #{startDate}
+			</if>
+			<if test="null != endDate and endDate != '' ">
+			   <![CDATA[AND DATE_FORMAT(create_time,'%Y-%m-%d') <= #{endDate}]]>
+			</if>
+		</where>
+	
+	</select>
+	
+	
+	
+	<insert id="insert" parameterType="com.khy.entity.User">
+	    insert into t_user
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
+	      <if test="uid != null">
+	        uid,
+	      </if>
+	      <if test="phone != null">
+	        phone,
+	      </if>
+	      <if test="password != null">
+	        password,
+	      </if>
+	      <if test="createTime != null">
+	        create_time,
+	      </if>
+	      <if test="money != null">
+	        money,
+	      </if>
+	      <if test="cardMoney != null">
+	        card_money,
+	      </if>
+	      <if test="commission != null">
+	        commission,
+	      </if>
+	      <if test="img != null">
+	        img,
+	      </if>
+	      <if test="imgUrl != null">
+	        img_url,
+	      </if>
+	      <if test="inviterUid != null">
+	        inviter_uid,
+	      </if>
+	      <if test="inviterPhone != null">
+	        inviter_phone,
+	      </if>
+	      <if test="isManager != null">
+	        is_manager,
+	      </if>
+	      <if test="isVip != null">
+	        is_vip,
+	      </if>
+	      <if test="status != null">
+	        status,
+	      </if>
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+	      <if test="uid != null">
+	        #{uid,jdbcType=VARCHAR},
+	      </if>
+	      <if test="phone != null">
+	        #{phone,jdbcType=VARCHAR},
+	      </if>
+	      <if test="password != null">
+	        #{password,jdbcType=VARCHAR},
+	      </if>
+	      <if test="createTime != null">
+	        #{createTime,jdbcType=TIMESTAMP},
+	      </if>
+	      <if test="money != null">
+	        #{money,jdbcType=DECIMAL},
+	      </if>
+	      <if test="cardMoney != null">
+	        #{cardMoney,jdbcType=DECIMAL},
+	      </if>
+	      <if test="commission != null">
+	        #{commission,jdbcType=DECIMAL},
+	      </if>
+	      <if test="img != null">
+	        #{img,jdbcType=VARCHAR},
+	      </if>
+	      <if test="imgUrl != null">
+	        #{imgUrl,jdbcType=VARCHAR},
+	      </if>
+	      <if test="inviterUid != null">
+	        #{inviterUid,jdbcType=VARCHAR},
+	      </if>
+	      <if test="inviterPhone != null">
+	        #{inviterPhone,jdbcType=VARCHAR},
+	      </if>
+	      <if test="isManager != null">
+	        #{isManager,jdbcType=INTEGER},
+	      </if>
+	      <if test="isVip != null">
+	        #{isVip,jdbcType=INTEGER},
+	      </if>
+	      <if test="status != null">
+	        #{status,jdbcType=INTEGER},
+	      </if>
+	    </trim>
+  </insert>
+  
+  <update id="updateUser" parameterType="com.khy.entity.User">
+  	UPDATE 
+  		t_user
+  	<set>
+  		<if test="null != password and password != '' ">
+  			password = #{password},
+  		</if>
+  		<if test="null != status">
+  			status = #{status},
+  		</if>
+  		<if test="null != isManager">
+  			is_manager = #{isManager},
+  		</if>
+  		<if test="null != isVip">
+  			is_vip = #{isVip},
+  		</if>
+  	</set> 
+	  	WHERE
+	  		uid=#{uid}
+  </update>
+  
+  <select id="listUserInviter" parameterType="com.khy.mapper.dto.UserCommonDTO" resultType="com.khy.mapper.dto.UserInviterDTO">
+	  SELECT
+			tui.uid,
+			tui.invited_uid,
+			tu.create_time,
+			tu.phone,
+			tu.commission,
+			tu.img,
+			CASE 
+			WHEN(tu.is_vip=0) 
+			THEN '普通会员' 
+			WHEN(tu.is_vip=1) 
+			THEN "VIP会员" 
+			END AS isVip		
+		FROM
+			t_user_inviter tui,
+			t_user tu
+		WHERE
+			tui.invited_uid = tu.uid
+		AND tui.uid = #{uid}
+		ORDER BY
+			tui.create_time DESC
+  </select>
+  
+  	<select id="listUserRecord" parameterType="com.alibaba.fastjson.JSONObject" resultType="com.khy.mapper.dto.UserRecordDTO">
+  		select
+  			uid, 
+  			pay_type, 
+  			type, 
+  			amount, 
+  			description, 
+  			create_time
+  		from
+  			t_user_record
+  		where
+  			uid=#{uid}
+  		and
+  			type=#{type}	
+  		<if test="type == 2">
+	  		and target_id is null
+  		</if>
+  	</select>
+  
+ </mapper>

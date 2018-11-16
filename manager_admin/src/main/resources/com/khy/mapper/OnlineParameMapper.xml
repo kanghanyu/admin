@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.khy.mapper.OnlineParameMapper">
+
+  <sql id="Base_Column_List">
+    id, title, content ,description,create_time
+  </sql>
+  
+  <select id="list" parameterType="com.khy.entity.OnlineParame" resultType="com.khy.entity.OnlineParame">
+  	select 
+  		<include refid="Base_Column_List"/>
+  	from
+  		t_online_parame
+  	where
+  		1 = 1
+  	<if test="null != title and title != '' ">
+  		AND title like concat('%',#{title},'%')
+  	</if>
+ 	order by create_time desc 	
+  </select>
+  
+  <select id="findByKey" parameterType="java.lang.String" resultType="com.khy.entity.OnlineParame">
+  	select 
+  		<include refid="Base_Column_List"/>
+  	from
+  		t_online_parame
+  	where
+ 		title =#{title}
+ 	limit 1	
+  </select>
+  
+  <insert id="insert" parameterType="com.khy.entity.OnlineParame">
+    insert into t_online_parame
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="title != null">
+        title,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="update" parameterType="com.khy.entity.OnlineParame">
+    update 
+    	t_online_parame
+    set 
+      	content = #{content,jdbcType=LONGVARCHAR},
+      	description = #{description,jdbcType=VARCHAR}
+    where 
+    	title = #{title,jdbcType=VARCHAR}
+  </update>
+  
+  
+  <delete id="delete" parameterType="java.lang.String">
+    delete from 
+    	t_online_parame
+    where 
+    	title = #{title,jdbcType=VARCHAR}
+  </delete>
+  
+</mapper>

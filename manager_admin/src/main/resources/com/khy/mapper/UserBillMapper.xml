@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.khy.mapper.UserBillMapper">
+  
+  <sql id="Base_Column_List">
+    id, uid, type, bill_type, order_id, amount,discount, postage,create_time, description,info
+  </sql>
+  
+   <select id="list" parameterType="com.khy.mapper.dto.UserCommonDTO" resultType="com.khy.entity.UserBill">
+   SELECT
+		tub.*, 
+		tu.phone
+	FROM
+		t_user_bill tub,
+		t_user tu
+	WHERE
+		tub.uid = tu.uid
+	<if test="null != billType">
+	AND	tub.bill_type = #{billType}
+	</if>
+	<if test="null != type">
+	AND	tub.type = #{type}
+	</if>
+	<if test="null != orderId and orderId != '' ">
+	AND tub.order_id = #{orderId}
+	</if>
+	<if test="null != phone and phone != '' ">
+	AND tu.phone = #{phone}
+	</if>
+   	<if test="null != startDate and startDate != '' ">
+		AND DATE_FORMAT(tub.create_time,'%Y-%m-%d') >= #{startDate}
+	</if>
+	<if test="null != endDate and endDate != '' ">
+	   <![CDATA[AND DATE_FORMAT(tub.create_time,'%Y-%m-%d') <= #{endDate}]]>
+	</if>	
+	ORDER BY tub.create_time DESC
+   </select>
+   
+   <select id="sumAmount" parameterType="com.khy.mapper.dto.UserCommonDTO" resultType="java.math.BigDecimal">
+   SELECT
+		IFNULL(SUM(tub.amount), 0) totalPay
+	FROM
+		t_user_bill tub,
+		t_user tu
+	WHERE
+		tub.uid = tu.uid
+	<if test="null != billType">
+	AND	tub.bill_type = #{billType}
+	</if>
+	<if test="null != type">
+	AND	tub.type = #{type}
+	</if>
+	<if test="null != orderId and orderId != '' ">
+	AND tub.order_id = #{orderId}
+	</if>
+	<if test="null != phone and phone != '' ">
+	AND tu.phone = #{phone}
+	</if>
+   	<if test="null != startDate and startDate != '' ">
+		AND DATE_FORMAT(tub.create_time,'%Y-%m-%d') >= #{startDate}
+	</if>
+	<if test="null != endDate and endDate != '' ">
+	   <![CDATA[AND DATE_FORMAT(tub.create_time,'%Y-%m-%d') <= #{endDate}]]>
+	</if>	
+   </select>
+   
+   
+   <select id="getEntityById" parameterType="com.khy.mapper.dto.UserCommonDTO" resultType="com.khy.entity.UserBill">
+   	SELECT
+		tub.*, 
+		tu.phone
+	FROM
+		t_user_bill tub,
+		t_user tu
+	WHERE
+		tub.uid = tu.uid
+	AND
+		tub.id = #{id}
+   </select>
+   
+    <insert id="insert" parameterType="com.khy.entity.UserBill">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into t_user_bill
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="uid != null">
+        uid,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="billType != null">
+        bill_type,
+      </if>
+      <if test="orderId != null">
+        order_id,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="info != null">
+        info,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="uid != null">
+        #{uid,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="billType != null">
+        #{billType,jdbcType=INTEGER},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="info != null">
+        #{info,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+</mapper>

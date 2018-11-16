@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.khy.mapper.ProductMapper">
+  <sql id="Base_Column_List">
+    product_id, product_name, product_price,cost_price,is_hot,stock_amount, sales_amount, cover_img, detail, detail_imgs,img,status, create_time
+  </sql>
+  
+  	
+  	<select id="list" parameterType="com.khy.entity.Product" resultType="com.khy.entity.Product">
+  		SELECT
+  			<include refid="Base_Column_List"/>
+  		FROM
+  			t_product
+  		<where>
+  			<if test="null != productId">
+  				product_id = #{productId}
+  			</if>
+  			<if test="null != productName and productName != '' ">
+  				and product_name like concat('%',#{productName},'%')
+  			</if>
+  			<if test="null != status">
+  				and status = #{status}
+  			</if>
+  			<if test="null != isHot">
+  				and is_hot = #{isHot}
+  			</if>
+  		</where>
+  		ORDER BY create_time DESC
+  	</select>
+  	
+  	
+  	<select id="findByProductId" parameterType="java.lang.Long" resultType="com.khy.entity.Product">
+  		SELECT
+  			<include refid="Base_Column_List"/>
+  		FROM
+  			t_product
+  		WHERE
+  			product_id = #{productId}
+  		ORDER BY create_time DESC
+  		LIMIT 1;
+  	</select>
+
+	 <delete id="delProduct" parameterType="java.lang.Long">
+	    delete from 
+	    	t_product
+	    where 
+			product_id = #{productId}
+	  </delete>
+	
+  
+  <update id="updateProduct" parameterType="com.khy.entity.Product">
+  	update
+  		t_product
+  	<set>
+  		<if test="null != productName and productName != '' ">
+  			product_name =#{productName},
+  		</if>
+  		<if test="null != productPrice">
+  			product_price=#{productPrice},
+  		</if>
+  		<if test="null != costPrice">
+  			cost_price=#{costPrice},
+  		</if>
+  		<if test="null != stockAmount">
+  			stock_amount=#{stockAmount},
+  		</if>
+  		<if test="null != isHot">
+  			is_hot=#{isHot},
+  		</if>
+  		<if test="null != coverImg and coverImg != '' ">
+  			cover_img =#{coverImg},
+  		</if>
+  		<if test="null != detailImgs and detailImgs != '' ">
+  			detail_imgs =#{detailImgs},
+  		</if>
+  		<if test="null != img and img != '' ">
+  			img =#{img},
+  		</if>
+  		<if test="null != detailImgs and detailImgs != '' ">
+  			detail_imgs =#{detailImgs},
+  		</if>
+  		<if test="null != detail and detail != '' ">
+  			detail =#{detail},
+  		</if>
+  		<if test="null != status">
+  			status=#{status},
+  		</if>
+  	</set>
+  	where
+  		product_id = #{productId}
+  </update>
+  
+  <insert id="insert" parameterType="com.khy.entity.Product">
+    insert into t_product
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="productName != null">
+        product_name,
+      </if>
+      <if test="productPrice != null">
+        product_price,
+      </if>
+      <if test="costPrice != null">
+        cost_price,
+      </if>
+      <if test="isHot != null">
+        is_hot,
+      </if>
+      <if test="stockAmount != null">
+        stock_amount,
+      </if>
+      <if test="salesAmount != null">
+        sales_amount,
+      </if>
+      <if test="coverImg != null">
+        cover_img,
+      </if>
+      <if test="img != null">
+        img,
+      </if>
+      <if test="detail != null">
+        detail,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="detailImgs != null">
+        detail_imgs,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="productName != null">
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="productPrice != null">
+        #{productPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="costPrice != null">
+        #{costPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="isHot != null">
+        #{isHot,jdbcType=INTEGER},
+      </if>
+      <if test="stockAmount != null">
+        #{stockAmount,jdbcType=INTEGER},
+      </if>
+      <if test="salesAmount != null">
+        #{salesAmount,jdbcType=INTEGER},
+      </if>
+      <if test="coverImg != null">
+        #{coverImg,jdbcType=VARCHAR},
+      </if>
+      <if test="img != null">
+        #{img,jdbcType=VARCHAR},
+      </if>
+      <if test="detail != null">
+        #{detail,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="detailImgs != null">
+        #{detailImgs,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+</mapper>

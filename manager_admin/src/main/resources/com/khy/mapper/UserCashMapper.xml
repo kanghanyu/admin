@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.khy.mapper.UserCashMapper">
+  <resultMap id="BaseResultMap" type="com.khy.entity.UserCash">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="uid" jdbcType="VARCHAR" property="uid" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="fee_amount" jdbcType="DECIMAL" property="feeAmount" />
+    <result column="real_amount" jdbcType="DECIMAL" property="realAmount" />
+    <result column="bank_name" jdbcType="VARCHAR" property="bankName" />
+    <result column="bank_num" jdbcType="VARCHAR" property="bankNum" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="bank_adress" jdbcType="VARCHAR" property="bankAdress" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="account_phone" jdbcType="VARCHAR" property="accountPhone" />
+    <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, uid, amount, fee_amount, real_amount, bank_name, bank_num, user_name, bank_adress, 
+    phone, apply_time, status, update_time
+  </sql>
+  
+  <select id="listUserCashByUid" parameterType="java.lang.String" resultMap="BaseResultMap">
+  	select
+  		<include refid="Base_Column_List"/>
+  	from
+  		t_user_cash
+  	where 
+  		uid = #{uid}
+  	ORDER BY apply_time DESC
+  </select>
+  
+  
+  <select id="get" parameterType="com.khy.mapper.dto.UserCommonDTO" resultMap="BaseResultMap">
+  	select
+  		<include refid="Base_Column_List"/>
+  	from
+  		t_user_cash
+  	where
+  		id = #{id}
+  	and	
+  		status = 0
+  </select>
+  
+  <select id="listUserCash" parameterType="com.khy.mapper.dto.UserCommonDTO" resultMap="BaseResultMap">
+	SELECT
+		tuc.id,
+		tuc.uid,
+		tuc.amount,
+		tuc.fee_amount,
+		tuc.real_amount,
+		tuc.bank_name,
+		tuc.bank_num,
+		tuc.user_name,
+		tuc.bank_adress,
+		tuc.phone,
+		tuc.apply_time,
+		tuc.status,
+		tu.phone as account_phone
+	FROM
+		t_user_cash tuc,
+		t_user tu
+	WHERE
+		tuc.uid =tu.uid
+	<if test="null != phone and phone != '' ">
+		AND tu.phone like concat('%',#{phone},'%')
+	</if>
+	<if test="null != status">
+		AND tuc.status=#{status}
+	</if>
+	ORDER BY tuc.apply_time DESC
+  </select>
+  
+  <update id="update" parameterType="com.khy.entity.UserCash">
+  	update
+  		t_user_cash
+  	set	
+  		status = #{status},
+  		update_time =#{updateTime}
+  	where
+  		id = #{id}
+  	and	
+  		uid = #{uid}
+  </update>
+  
+</mapper>

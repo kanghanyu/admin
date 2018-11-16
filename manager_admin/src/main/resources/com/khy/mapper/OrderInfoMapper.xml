@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.khy.mapper.OrderInfoMapper">
+ 
+  <sql id="Base_Column_List">
+    id, order_id, order_type, pay_type, uid, total_money, discount, discount_detail, 
+    discount_money,total_pay,rmb,corn_money,total_cost, product_detail,status, pay_status,create_time, 
+   invalid_time,pay_time,postage,user_name,address,post_code,phone,description,trade_no,is_bill,is_send
+  </sql>
+  
+	<select id="getUserBill" parameterType="java.lang.String" resultType="com.khy.entity.OrderInfo">
+	  	SELECT	
+	  		<include refid="Base_Column_List"/>
+	  	FROM
+	  		t_order_info
+	  	WHERE
+	  		uid =#{uid}
+	  	AND	status = 2
+	  	AND order_type in (1,2)
+	  	AND pay_status in (2,4)
+	  	ORDER BY pay_time DESC
+  </select>
+
+  <select id="listOrderInfo" parameterType="com.khy.entity.OrderInfo" resultType="com.khy.entity.OrderInfo">
+  	SELECT	
+  		<include refid="Base_Column_List"/>
+  	FROM
+  		t_order_info
+  	WHERE
+  		uid =#{uid}
+  	<if test="null != orderType">
+	  	AND order_type = #{orderType}
+  	</if>
+  	ORDER BY create_time DESC
+  </select>
+  
+  <select id="getEntityById" parameterType="com.khy.mapper.dto.UserCommonDTO" resultType="com.khy.entity.OrderInfo">
+  	select
+  		<include refid="Base_Column_List"/>
+  	from
+  		t_order_info
+  	where
+  		order_id = #{orderId}
+  	limit 1
+  </select>
+  	
+  
+  <select id="list" parameterType="com.khy.mapper.dto.UserCommonDTO" resultType="com.khy.entity.OrderInfo">
+  	SELECT
+		toi.*,
+		tu.phone as amountPhone
+	FROM
+		t_order_info toi,
+		t_user tu
+	WHERE
+		toi.uid=tu.uid
+	AND toi.order_type=4
+	<if test="null != orderId and orderId != '' ">
+	AND toi.order_id = #{orderId}
+	</if>
+	<if test="null != phone and phone != '' ">
+	AND tu.phone = #{phone}
+	</if>
+	<if test="null != startDate and startDate != '' ">
+		AND DATE_FORMAT(toi.create_time,'%Y-%m-%d') >= #{startDate}
+	</if>
+	<if test="null != endDate and endDate != '' ">
+	   <![CDATA[AND DATE_FORMAT(toi.create_time,'%Y-%m-%d') <= #{endDate}]]>
+	</if>
+	<if test="null != isSend">
+		AND toi.is_send = #{isSend}
+	</if>
+	<if test="null != status">
+		<if test="status == 1">
+			AND toi.status = 1 AND toi.pay_status =1
+		</if>	
+		<if test="status == 2">
+			 AND toi.pay_status in (2,4)
+		</if>	
+		<if test="status == 3">
+			AND toi.status = 2 AND toi.pay_status = 3
+		</if>	
+	</if>
+	ORDER BY toi.create_time DESC
+  </select>
+  
+  <select id="countOrderMoney" parameterType="com.khy.mapper.dto.UserCommonDTO" resultType="com.alibaba.fastjson.JSONObject">
+  	SELECT
+		IFNULL(SUM(toi.total_money), 0) + IFNULL(SUM(toi.postage), 0) totalMoney,
+		IFNULL(SUM(toi.total_pay), 0) totalPay
+	FROM
+		t_order_info toi,
+		t_user tu
+	WHERE
+		toi.uid = tu.uid
+	AND toi.order_type = 4
+  <if test="null != orderId and orderId != '' ">
+	AND toi.order_id = #{orderId}
+	</if>
+	<if test="null != phone and phone != '' ">
+	AND tu.phone = #{phone}
+	</if>
+	<if test="null != startDate and startDate != '' ">
+		AND DATE_FORMAT(toi.create_time,'%Y-%m-%d') >= #{startDate}
+	</if>
+	<if test="null != endDate and endDate != '' ">
+	   <![CDATA[AND DATE_FORMAT(toi.create_time,'%Y-%m-%d') <= #{endDate}]]>
+	</if>
+	<if test="null != isSend">
+		AND toi.is_send = #{isSend}
+	</if>
+	<if test="null != status">
+		<if test="status == 1">
+			AND toi.status = 1 AND toi.pay_status =1
+		</if>	
+		<if test="status == 2">
+			 AND toi.pay_status in (2,4)
+		</if>	
+		<if test="status == 3">
+			AND toi.status = 2 AND toi.pay_status = 3
+		</if>	
+	</if>
+  </select>
+  
+  <delete id="deleteOrderByOrderId" parameterType="java.lang.String">
+	delete from t_order_info 
+	where order_id = #{orderId}
+</delete>
+  
+  <update id="isSend" parameterType="com.khy.mapper.dto.UserCommonDTO" >
+  	update
+  		t_order_info
+  	set
+  		is_send=#{isSend}
+  	where order_id = #{orderId}
+  </update>
+</mapper> 
